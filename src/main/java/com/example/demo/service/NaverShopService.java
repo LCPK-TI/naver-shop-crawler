@@ -18,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.demo.entity.Product;
+import com.example.demo.entity.ProductImg;
+import com.example.demo.repository.ProductImgRepository;
 import com.example.demo.repository.ProductRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,12 +33,14 @@ public class NaverShopService {
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final ProductRepository productRepository;
+	private final ProductImgRepository productImgRepository;
 
-	private final String CLIENT_ID = "";
-	private final String CLIENT_SECRET = "";
+	private final String CLIENT_ID = "Gb4rnW0uxnXdehzyFi9P";
+	private final String CLIENT_SECRET = "6byhHAbRY5";
 
-	public NaverShopService(ProductRepository productRepository) {
+	public NaverShopService(ProductRepository productRepository ,ProductImgRepository productImgRepository) {
 		this.productRepository = productRepository;
+		this.productImgRepository = productImgRepository;
 	}
 
 	@Transactional
@@ -109,12 +113,21 @@ public class NaverShopService {
 				
 				p.setCategoryNo(59L); //카테고리 번호 수정
 				
-				p.setStock(10L); // 기본값
+				p.setStock(10L); // 재고 수정
+				
 				p.setLink(String.valueOf(item.get("link")));
 
 				// 1차 저장 (productNo 채워짐)
 				Product saved = productRepository.save(p);
-
+				// **API 이미지 URL 저장**
+				String imageUrl = String.valueOf(item.get("image"));
+				if (imageUrl != null && !imageUrl.isEmpty()) {
+				    ProductImg img = new ProductImg();
+				    img.setImgUrl(imageUrl);
+				    img.setProductNo(saved);  // Product와 연결
+				    img.setIsMain("Y");
+				    productImgRepository.save(img);  // ProductImg 테이블에 저장
+				}
 				// 상품번호 기반 파일명 규칙 적용
 				String fileName = saved.getProductNo() + "-detail.jpg";
 				saved.setDetailImgUrl("/product_img/" + fileName);
