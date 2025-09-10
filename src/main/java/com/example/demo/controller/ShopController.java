@@ -1,0 +1,31 @@
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.entity.Product;
+import com.example.demo.service.NaverShopService;
+
+@RestController
+public class ShopController {
+
+    private final NaverShopService naverShopService;
+
+    public ShopController(NaverShopService naverShopService) {
+        this.naverShopService = naverShopService;
+    }
+
+    /**
+     * /search-moodlight 호출 시
+     * 1. 네이버 쇼핑 API에서 무드등 데이터 가져오기
+     * 2. 오라클 DB PRODUCT 테이블에 저장 (중복체크 포함)
+     * 3. 저장된 데이터 JSON 반환
+     */
+    @GetMapping("/product")
+    public List<Product> searchAndSave() {
+        return naverShopService.searchAndSave("스탠드",1, 1); //검색어, 한번에 가져올 검색 결과 개수, 검색 시작 위치
+        //검색 시작 위치가 21이면 21번째부터 40번째까지
+    }
+}
