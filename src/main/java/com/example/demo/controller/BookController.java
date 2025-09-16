@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.Book;
 import com.example.demo.service.NaverBookService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class BookController {
 
     private final NaverBookService naverBookService;
 
-    public BookController(NaverBookService naverBookService) {
-        this.naverBookService = naverBookService;
-    }
     /**
      * /search-moodlight 호출 시
      * 1. 네이버 쇼핑 API에서 무드등 데이터 가져오기

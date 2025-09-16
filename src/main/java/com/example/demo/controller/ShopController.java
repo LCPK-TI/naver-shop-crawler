@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.Product;
 import com.example.demo.service.NaverShopService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class ShopController {
 
     private final NaverShopService naverShopService;
 
-    public ShopController(NaverShopService naverShopService) {
-        this.naverShopService = naverShopService;
-    }
 
     /**
      * /search-moodlight 호출 시
@@ -25,7 +25,7 @@ public class ShopController {
      */
     @GetMapping("/product")
     public List<Product> searchAndSave() {
-        return naverShopService.searchAndSave("스탠드",1, 1); //검색어, 한번에 가져올 검색 결과 개수, 검색 시작 위치
+        return naverShopService.searchAndSave("침구",10, 1); //검색어, 한번에 가져올 검색 결과 개수, 검색 시작 위치
         //검색 시작 위치가 21이면 21번째부터 40번째까지
     }
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jsoup.Jsoup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,20 +26,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class NaverBookService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final BookRepository bookRepository;
     
-    private final String CLIENT_ID = "";
-    private final String CLIENT_SECRET = "";
-
-    public NaverBookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+    @Value("${naver.api.key}")
+    private String CLIENT_SECRET;
+    
+    @Value("${naver.client.id}")
+    private String CLIENT_ID;
+    
+    
     @Transactional
     public List<Book> searchAndSave(String query, int display, int start) {
         try {

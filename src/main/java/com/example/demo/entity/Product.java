@@ -23,8 +23,6 @@ public class Product {
 	@Column(name = "PRODUCT_PRICE")
 	private Long price;
 
-	@Column(name = "PRODUCT_STOCK")
-	private Long stock;
 
 	@Column(name = "LINK")
 	private String link;
@@ -72,13 +70,6 @@ public class Product {
 		this.price = price;
 	}
 
-	public Long getStock() {
-		return stock;
-	}
-
-	public void setStock(Long stock) {
-		this.stock = stock;
-	}
 
 	public Long getCategoryNo() {
 		return categoryNo;

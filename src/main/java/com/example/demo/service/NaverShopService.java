@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jsoup.Jsoup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,8 +27,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class NaverShopService {
 
 	private final RestTemplate restTemplate = new RestTemplate();
@@ -35,13 +38,12 @@ public class NaverShopService {
 	private final ProductRepository productRepository;
 	private final ProductImgRepository productImgRepository;
 
-	private final String CLIENT_ID = "Gb4rnW0uxnXdehzyFi9P";
-	private final String CLIENT_SECRET = "6byhHAbRY5";
-
-	public NaverShopService(ProductRepository productRepository ,ProductImgRepository productImgRepository) {
-		this.productRepository = productRepository;
-		this.productImgRepository = productImgRepository;
-	}
+	@Value("${naver.api.key}")
+    private String CLIENT_SECRET;
+    
+    @Value("${naver.client.id}")
+    private String CLIENT_ID;
+    
 
 	@Transactional
 	public List<Product> searchAndSave(String query, int display, int start) {
@@ -81,7 +83,11 @@ public class NaverShopService {
 			List<Map<String, Object>> items = objectMapper.convertValue(itemsNode,
 					new TypeReference<List<Map<String, Object>>>() {
 					});
-
+			 // Smartstore 필터링
+//	        items.removeIf(item -> {
+//	            String link = String.valueOf(item.get("link"));
+//	            return link == null || !link.contains("smartstore.naver.com");
+//	        });
 			// 5️⃣ DB 저장 (상품)
 			List<Product> savedProducts = new ArrayList<>();
 			for (Map<String, Object> item : items) {
@@ -111,9 +117,8 @@ public class NaverShopService {
 				}
 				p.setPrice(price);
 				
-				p.setCategoryNo(59L); //카테고리 번호 수정
+				p.setCategoryNo(15L); //카테고리 번호 수정
 				
-				p.setStock(10L); // 재고 수정
 				
 				p.setLink(String.valueOf(item.get("link")));
 
@@ -128,12 +133,7 @@ public class NaverShopService {
 				    img.setIsMain("Y");
 				    productImgRepository.save(img);  // ProductImg 테이블에 저장
 				}
-				// 상품번호 기반 파일명 규칙 적용
-				String fileName = saved.getProductNo() + "-detail.jpg";
-				saved.setDetailImgUrl("/product_img/" + fileName);
-
-				// 2차 저장 (detailImgUrl 반영)
-				savedProducts.add(productRepository.save(saved));
+				
 			}
 			return savedProducts;
 
